@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 import http
@@ -17,32 +18,85 @@ HTML_WRAP = '''\
   <head>
     <title>DB Forum</title>
     <style>
-      h1, form { text-align: center; }
-      textarea { width: 400px; height: 100px; }
-      div.post { border: 1px solid #999;
-                 padding: 10px 10px;
-                 margin: 10px 20%%; }
-      hr.postbound { width: 50%%; }
-      em.date { color: #999 }
+    body{
+    font-family: Helvetica, Arial ,sans-serif;
+    box-sizing: border-box;
+    background: white;
+    margin: 0;
+    }
+    .container{
+    max-width: 750px;
+    margin: auto;
+    padding: 0px 10px;
+    background: darkgrey;
+    min-height: 100vh;
+    }
+
+.container > ul{
+    border: 1px solid grey;
+    background-color:white;
+    border-radius: 15px;
+    padding: 0px;
+    margin:0px;
+}
+
+.container >ul >li{
+    margin: 0;
+    display: flex;
+    padding: 10px 10px;
+    border-bottom: 1px solid grey;
+}
+
+.container >h1{
+    background-color: blueviolet;
+    margin:-1px -10px;
+    padding:15px 0px;
+    border-bottom:1px solid voilet;
+    text-align: center;
+    box-shadow: 0 1px 0 #888888;
+}
+.container >h4{
+    margin: 15px 0;
+}
+.container >ul :last-child{
+    border:0;
+}
+
+.name {
+    width: 70%%;
+}
+.value{
+    width: 30%%;
+}
+
+.value{
+    text-align: right;
+}
+
+.loading{
+    padding: 10px;
+}
+
     </style>
   </head>
-  <body style="text-align:center" >
+  <body >
+  <div class='container'>
     <h1>News Report</h1>
     <!-- post content will go here -->
-    <h3>Articles</h3>
-    <div id="pa">
-    Loading Popular articles...
-    </div>
-    <h3>Authors</h3>
-    <div id="aa">
-    Loading Popular authors...
-    </div>
-    <h3>High Failed Dates</h3>    
-    <div id="rc">
-    Loading Failed records...
-    </div>
+    <h4>Articles</h4>
+    <ul id="pa">
+     <div class="loading">Loading Popular articles...</div>
+    </ul>
+    <h4>Authors</h4>
+    <ul id="aa">
+    <div class="loading">Loading Popular authors...</div>
+    </ul>
+    <h4>High Failed Dates</h4>
+    <ul id="rc">
+    <div class="loading">Loading Failed records...</div>
+    </ul>
 %s
-
+</div>
     <script
   src="https://code.jquery.com/jquery-3.2.1.min.js"
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
@@ -67,7 +121,7 @@ HTML_WRAP = '''\
 
 # HTML template for an individual comment
 POST = '''\
-    <div class=post><em class=date>%s</em><br>%s</div>
+    <li><div class=name>%s</div> <div class=value> %s </div></li>
 '''
 
 
@@ -97,8 +151,8 @@ class RequestHandler (BaseHTTPRequestHandler):
                 return
             if self.path.endswith("/rc"):
                 requests = "".join(
-                    POST % (date, data_item.evaluate_precent())
-                    for date, data_item in getRequestCount().items())
+                    POST % (date, str(error_percentage) + ' %')
+                    for date, error_percentage in getRequestCount())
                 self.wfile.write(requests.encode())
                 return
             body = ""
